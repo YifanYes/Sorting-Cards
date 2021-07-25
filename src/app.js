@@ -1,9 +1,9 @@
-/* eslint-disable */
 import "bootstrap";
 import "./style.css";
 
 //Variables
 const SECTION = document.querySelector("#mySection");
+const SECTION2 = document.querySelector("#mySection2");
 const VALUES = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
 const SUITS = ["♠", "♥", "♦", "♣"];
 
@@ -15,19 +15,24 @@ const SELECTION = document.querySelector("#selection");
 window.onload = function() {
   //Pintar el fondo de verde
   SECTION.classList.add("background");
+  SECTION2.classList.add("background");
   let listOfCards = [];
+
   //Evento de Draw
   DRAW.addEventListener("click", event => {
     listOfCards = createCard(event);
+    SECTION2.innerHTML = "";
   });
 
   //Evento de bubble sort
   BUBBLE.addEventListener("click", event => {
+    SECTION2.innerHTML = "";
     bubbleSort(listOfCards);
   });
 
   //Evento de selection sort
   SELECTION.addEventListener("click", event => {
+    SECTION2.innerHTML = "";
     selectionSort(listOfCards);
   });
 };
@@ -46,16 +51,42 @@ function createCard(event) {
   for (let i = 0; i < INPUT.value; i++) {
     cards.push(drawnCard());
   }
-  console.log(cards);
   return cards;
 }
 
-function drawnCard() {
+function drawnCard(family = null, number = null) {
   //Crea un objeto carta
-  let card = {
-    suit: SUITS[getRandom(SUITS)],
-    value: VALUES[getRandom(VALUES)]
-  };
+  let card;
+
+  if (family == null || number == null) {
+    card = {
+      suit: SUITS[getRandom(SUITS)],
+      value: VALUES[getRandom(VALUES)],
+      index: null
+    };
+  } else {
+    card = {
+      suit: family,
+      value: number,
+      index: null
+    };
+  }
+
+  card.index = card.value;
+
+  //Reemplaza los numeros 11,12,13,14 por J,Q,K,A
+  if (card.value == 14) {
+    card.value = "A";
+  }
+  if (card.value == 11) {
+    card.value = "J";
+  }
+  if (card.value == 12) {
+    card.value = "Q";
+  }
+  if (card.value == 13) {
+    card.value = "K";
+  }
 
   //Contiene la carta entera
   let drawnCard = document.createElement("div");
@@ -80,30 +111,8 @@ function drawnCard() {
   let secondSuit = document.createTextNode(card.suit);
   secondSuitContainer.appendChild(secondSuit);
   secondSuitContainer.classList.add("align-end");
+  secondSuitContainer.classList.add("invert");
   drawnCard.appendChild(secondSuitContainer);
-
-  //Reemplaza los numeros 11,12,13 por J,Q,K
-  if (
-    card.value != 1 &&
-    card.value != 11 &&
-    card.value != 12 &&
-    card.value != 13 &&
-    card.value != 14
-  ) {
-    value.innerHTML = card.value;
-  }
-  if (card.value == 14) {
-    value.innerHTML = "A";
-  }
-  if (card.value == 11) {
-    value.innerHTML = "J";
-  }
-  if (card.value == 12) {
-    value.innerHTML = "Q";
-  }
-  if (card.value == 13) {
-    value.innerHTML = "K";
-  }
 
   //Pinta rojo o negro dependiendo del suit
   if (card.suit == "♥" || card.suit == "♦") {
@@ -116,50 +125,44 @@ function drawnCard() {
     secondSuitContainer.classList.add("black");
   }
 
-  SECTION.appendChild(drawnCard);
-
-  return card;
+  if (family == null || number == null) {
+    SECTION.appendChild(drawnCard);
+    return card;
+  } else {
+    SECTION2.appendChild(drawnCard);
+  }
 }
 
 function bubbleSort(listOfCards) {
-  let listValue = [];
-  for (let i = 0; i < listOfCards.length; i++) {
-    listValue.push(listOfCards[i].value);
-  }
-  console.log(listValue);
-  for (var i = 0; i < listValue.length; i++) {
-    // Last i elements are already in place
-    for (var j = 0; j < listValue.length - i - 1; j++) {
-      // Checking if the item at present iteration
-      // is greater than the next iteration
-      if (listValue[j] > listValue[j + 1]) {
-        // If the condition is true then swap them
-        var temp = listValue[j];
-        listValue[j] = listValue[j + 1];
-        listValue[j + 1] = temp;
+  for (var i = 0; i < listOfCards.length; i++) {
+    for (var j = 0; j < listOfCards.length - i - 1; j++) {
+      if (listOfCards[j].index > listOfCards[j + 1].index) {
+        var temp = listOfCards[j];
+        listOfCards[j] = listOfCards[j + 1];
+        listOfCards[j + 1] = temp;
       }
     }
   }
-  // Print the sorted array
-  console.log(listValue);
+  for (let i = 0; i < listOfCards.length; i++) {
+    drawnCard(listOfCards[i].suit, listOfCards[i].value);
+  }
 }
 
 function selectionSort(listOfCards) {
   let min = 0;
-  let counter = 0;
   while (min < listOfCards.length - 1) {
     for (let i = min + 1; i < listOfCards.length; i++) {
-      if (listOfCards[min].value > listOfCards[i].value) {
+      if (listOfCards[min].index > listOfCards[i].index) {
         let aux = listOfCards[min];
         listOfCards[min] = listOfCards[i];
         listOfCards[i] = aux;
-        createCard(listOfCards, counter);
-        counter++;
       }
     }
     min++;
   }
-  return listOfCards;
+  for (let i = 0; i < listOfCards.length; i++) {
+    drawnCard(listOfCards[i].suit, listOfCards[i].value);
+  }
 }
 
 function getRandom(list) {
