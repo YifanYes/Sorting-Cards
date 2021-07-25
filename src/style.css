@@ -47,8 +47,16 @@ body {
 
 .align-start {
   align-self: flex-start;
+  margin-top: -1.25rem;
+  padding-bottom: 1.25rem;
 }
 
 .align-end {
   align-self: flex-end;
+  margin-bottom: -1.25rem;
+  padding-bottom: 1.25rem;
+}
+
+.invert {
+  transform: rotate(0.5turn);
 }
